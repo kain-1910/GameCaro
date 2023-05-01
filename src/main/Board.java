@@ -3,6 +3,8 @@ package main;
 import static contants.Contants.BoardContants.*;
 import static contants.Contants.GameResult.*;
 
+import java.lang.Math;
+import java.util.ArrayList;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -30,15 +32,20 @@ public class Board extends JPanel {
 	private String currentPlayer = Cell.O_VALUE;
 	private boolean[][] ticked;
 	private int Gamestate = NORMAL;
+	private int quantityChar = 5;
+	private boolean muteEffect = false;
 	private Clip clip;
+	private int[] colWin;
+	private int[] rowWin;
 	
 	public Board() {
 		
 		initMatrix();  
 		setBoardSize();  
 		loadImgs();     
-   
 		
+		colWin = new int[quantityChar];
+		rowWin = new int[quantityChar];
 		
 //		add sự kiện chuột
 		addMouseListener(new MouseAdapter() {
@@ -74,12 +81,10 @@ public class Board extends JPanel {
 	private void showResult(int Gamestate) {
 		if(Gamestate == WIN) {
 			JOptionPane.showMessageDialog(null, currentPlayer + " là người chiến thắng");
-			
 			resetGame();
 		}
 		else if(Gamestate == DRAW) {
 			JOptionPane.showMessageDialog(null, "Ván đấu hòa");
-			
 			resetGame();
 		}
 		
@@ -168,12 +173,11 @@ public class Board extends JPanel {
 					File clickEffect = new File("sound/click.wav");
 					AudioInputStream audioInput = AudioSystem.getAudioInputStream(clickEffect);
 					clip.open(audioInput);
-					clip.start();
+					if(!muteEffect) clip.start();
 				} catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				
 				
 			}
 		});
@@ -199,8 +203,9 @@ public class Board extends JPanel {
 		for(int i = 0; i < BOARD_COL; i++) {
 			if(matrix[row][i].getValue().equals(value)) {
 				cnt++;
-				if(cnt == 5) 
+				if(cnt == quantityChar) 
 					return true;
+				
 			}else cnt = 0;	
 			
 		}
@@ -210,7 +215,7 @@ public class Board extends JPanel {
 		for(int i = 0; i < BOARD_ROW; i++) {
 			if(matrix[i][col].getValue().equals(value)) {
 				cnt++;
-				if(cnt == 5) 
+				if(cnt == quantityChar) 
 					return true;
 			}else cnt = 0;	
 			
@@ -224,7 +229,7 @@ public class Board extends JPanel {
 		for(;topR < BOARD_ROW && topC < BOARD_COL; topR++, topC++) {
 			if(matrix[topR][topC].getValue().equals(value)) {
 				cnt++;
-				if(cnt == 5) 
+				if(cnt == quantityChar) 
 					return true;
 			}else cnt = 0;	
 			
@@ -242,7 +247,7 @@ public class Board extends JPanel {
 		for(;topR < BOARD_ROW && topC >= 0; topR++, topC--) {
 			if(matrix[topR][topC].getValue().equals(value)) {
 				cnt++;
-				if(cnt == 5) 
+				if(cnt == quantityChar) 
 					return true;
 			}else cnt = 0;	
 			
@@ -261,6 +266,12 @@ public class Board extends JPanel {
 		else 
 			currentPlayer = Cell.X_VALUE;
 	}
+	
+	public void muteEffect() {
+		muteEffect = !muteEffect;
+//		if(muteEffect) clip.stop();
+//		else clip.start();
+	}
 
 	public int getScoreX() {
 		return scoreX;
@@ -274,4 +285,7 @@ public class Board extends JPanel {
 		this.currentPlayer = currentPlayer;
 	}
 
+	public void setQuantityChar(int quantityChar) {
+		this.quantityChar = quantityChar;
+	}
 }

@@ -19,20 +19,14 @@ public class Game {
 	private GamePanel gamePanel;
 	private Clip clip;
 	private Menu menu;
-	private int state = MENU;
-	
+	private boolean muteSong = false;
 
 	public Game() {
-		menu = new Menu(this);
 		gamePanel = new GamePanel(this);
 		gameWindow = new GameWindow(gamePanel);
-//		check có phải đang ở trạng thái menu hay không
-		if(state == PLAYING) {
-			menu.dispose();
-		}
-		
+		menu = new Menu(this);
 		playSong();
-	
+		
 	}
 //	nhạc game
 	private void playSong() {
@@ -45,7 +39,6 @@ public class Game {
 					AudioInputStream audioInput = AudioSystem.getAudioInputStream(song);
 					clip.open(audioInput);
 					clip.loop(Clip.LOOP_CONTINUOUSLY);
-					clip.start();
 				} catch (IOException | LineUnavailableException | UnsupportedAudioFileException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -59,8 +52,11 @@ public class Game {
 	public GameWindow getGameWindow() {
 		return gameWindow;
 	}
-
-	public void setState(int state) {
-		this.state = state;
+	
+	public void muteSong() {
+		muteSong = !muteSong;
+		if(muteSong) clip.stop();
+		else clip.start();
 	}
+	
 }
