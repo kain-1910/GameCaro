@@ -35,8 +35,7 @@ public class Board extends JPanel {
 	private int quantityChar = 5;
 	private boolean muteEffect = false;
 	private Clip clip;
-	private int[] colWin;
-	private int[] rowWin;
+
 	
 	public Board() {
 		
@@ -44,8 +43,7 @@ public class Board extends JPanel {
 		setBoardSize();  
 		loadImgs();     
 		
-		colWin = new int[quantityChar];
-		rowWin = new int[quantityChar];
+		
 		
 //		add sự kiện chuột
 		addMouseListener(new MouseAdapter() {
@@ -196,9 +194,8 @@ public class Board extends JPanel {
 		else return false;
 	}
 	
-	// check có thắng không
-	private boolean checkWin(String value, int row, int col) {
-//		check ngang
+	// check dọc
+	private boolean checkHorizon(String value, int row, int col) {
 		int cnt = 0;
 		for(int i = 0; i < BOARD_COL; i++) {
 			if(matrix[row][i].getValue().equals(value)) {
@@ -207,23 +204,24 @@ public class Board extends JPanel {
 					return true;
 				
 			}else cnt = 0;	
-			
 		}
-		
-//		check dọc
-		cnt = 0;
+		return false;
+	}
+//	check ngang
+	private boolean checkVertical(String value, int row, int col) {
+		int cnt = 0;
 		for(int i = 0; i < BOARD_ROW; i++) {
 			if(matrix[i][col].getValue().equals(value)) {
 				cnt++;
 				if(cnt == quantityChar) 
 					return true;
 			}else cnt = 0;	
-			
 		}
-		
-		
-//		check chéo trái -> phải
-		cnt = 0;
+		return false;
+	}
+//	check chéo chính
+	private boolean checkMainDiagonal(String value, int row, int col) {
+		int cnt = 0;
 		int topR = row - Math.min(col, row);
 		int topC = col - Math.min(col, row);
 		for(;topR < BOARD_ROW && topC < BOARD_COL; topR++, topC++) {
@@ -232,13 +230,15 @@ public class Board extends JPanel {
 				if(cnt == quantityChar) 
 					return true;
 			}else cnt = 0;	
-			
 		}
-		
-//		check chéo phải -> trái
-		cnt = 0;
-		topR = row - Math.min(col, row);
-		topC = col + Math.min(col, row);
+		return false;
+	}
+	
+//	check chéo phụ
+	private boolean checkSubDiagonal(String value, int row, int col) {
+		int cnt = 0;
+		int topR = row - Math.min(col, row);
+		int topC = col + Math.min(col, row);
 		if(topC >= BOARD_COL) {
 			topR += topC - (BOARD_COL -1);
 			topC = BOARD_COL -1;
@@ -252,9 +252,17 @@ public class Board extends JPanel {
 			}else cnt = 0;	
 			
 		}
-		
 		return false;
 	}
+	
+	// check có thắng không
+	private boolean checkWin(String value, int row, int col) {		
+		return checkHorizon(value, row, col)
+				|| checkVertical(value, row, col)
+				|| checkMainDiagonal(value, row, col)
+				|| checkSubDiagonal(value, row, col);
+	}
+
 
 	public String getCurrentPlayer() {
 		return currentPlayer;
